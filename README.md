@@ -15,4 +15,4 @@
 - Deleting posts
 - Deleting comments
 
-![MVE-Blog](00-screenshot/mve-blog.png 'MVE-Blog')
+![MVE-Blog](screenshot/mve-blog.png 'MVE-Blog')

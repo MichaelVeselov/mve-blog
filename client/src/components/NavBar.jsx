@@ -17,7 +17,9 @@ export const NavBar = () => {
   const handleLogOut = async () => {
     try {
       await dispatch(logOut());
-      window.localStorage.removeItem('token');
+      window.localStorage.removeItem('accessToken');
+      window.localStorage.removeItem('refreshToken');
+      window.localStorage.removeItem('expires');
       toast('You are logged out...');
       navigate('/');
     } catch (error) {

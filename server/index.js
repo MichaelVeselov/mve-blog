@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 
+import initDatabase from './startUp/initDatabase.js';
+
 import authRoute from './routes/authRoute.js';
 import postRoute from './routes/postRoute.js';
 import commentRoute from './routes/commentRoute.js';
@@ -27,6 +29,10 @@ app.use('/api/comments', commentRoute);
 
 async function start() {
   try {
+    mongoose.connection.once('open', () => {
+      initDatabase();
+    });
+
     await mongoose.connect(
       `mongodb+srv://${DB_USER}:${DB_PASSWORD}@cluster0.vkbo75w.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`,
       { useNewUrlParser: true, useUnifiedTopology: true }
@@ -34,7 +40,7 @@ async function start() {
     console.log('Connected to MongoDB/MVE-Blog...');
 
     app.listen(PORT, () => {
-      console.log(`Server started on port: ${PORT}.`);
+      console.log(`Server started on port: ${PORT}...`);
     });
   } catch (error) {
     console.log(error);

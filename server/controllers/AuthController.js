@@ -16,17 +16,18 @@ export const registration = async (request, response) => {
       avatarUrl = '',
     } = request.body;
 
-    const { userData, token } = await createUser(
-      firstName,
-      lastName,
-      email,
-      password,
-      avatarUrl
-    );
+    const {
+      userData,
+      accessToken,
+      refreshToken,
+      expiresIn = 3600,
+    } = await createUser(firstName, lastName, email, password, avatarUrl);
 
     response.json({
       userData,
-      token,
+      accessToken,
+      refreshToken,
+      expiresIn,
       message: 'You have successfully registered...',
     });
   } catch (error) {
@@ -38,14 +39,22 @@ export const login = async (request, response) => {
   try {
     const { email, password } = request.body;
 
-    const { userData, token } = await loginUser(email, password);
+    const {
+      userData,
+      accessToken,
+      refreshToken,
+      expiresIn = 3600,
+    } = await loginUser(email, password);
 
     response.json({
       userData,
-      token,
+      accessToken,
+      refreshToken,
+      expiresIn,
       message: 'You have successfully logged on...',
     });
   } catch (error) {
+    console.log(error);
     response.json({ message: 'Authorization failed...' });
   }
 };
@@ -53,9 +62,18 @@ export const login = async (request, response) => {
 export const getProfile = async (request, response) => {
   try {
     const { userId } = request;
-    const userData = await getProfileUser(userId);
+    const {
+      userData,
+      accessToken,
+      refreshToken,
+      expiresIn = 3600,
+    } = await getProfileUser(userId);
+
     response.json({
       userData,
+      accessToken,
+      refreshToken,
+      expiresIn,
     });
   } catch (error) {
     response.json({ message: 'Permission denied...' });

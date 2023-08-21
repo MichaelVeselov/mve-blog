@@ -5,8 +5,9 @@ export const checkAuth = (request, response, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+      const decoded =
+        jwt.verify(token, process.env.JWT_ACCESS_SECRET) ||
+        jwt.verify(token, process.env.JWT_REFRESH_SECRET);
       request.userId = decoded.id;
       next();
     } catch (error) {

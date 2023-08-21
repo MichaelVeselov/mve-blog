@@ -2,6 +2,25 @@ import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const generateTokens = async (userId) => {
+  const accessToken = jwt.sign(
+    {
+      id: userId,
+    },
+    process.env.JWT_ACCESS_SECRET,
+    { expiresIn: '1h' }
+  );
+
+  const refreshToken = jwt.sign(
+    {
+      id: userId,
+    },
+    process.env.JWT_REFRESH_SECRET
+  );
+
+  return { accessToken, refreshToken, expiresIn: 3600 };
+};
+
 export const createUser = async (
   firstName,
   lastName,
@@ -29,15 +48,11 @@ export const createUser = async (
 
   const { password: passwordHash, ...userData } = user._doc;
 
-  const token = jwt.sign(
-    {
-      id: user._id,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+  const { accessToken, refreshToken, expiresIn } = await generateTokens(
+    user._id
   );
 
-  return { userData, token };
+  return { userData, accessToken, refreshToken, expiresIn };
 };
 
 export const loginUser = async (email, password) => {
@@ -54,15 +69,11 @@ export const loginUser = async (email, password) => {
 
   const { password: passwordHash, ...userData } = user._doc;
 
-  const token = jwt.sign(
-    {
-      id: user._id,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+  const { accessToken, refreshToken, expiresIn } = await generateTokens(
+    user._id
   );
 
-  return { userData, token };
+  return { userData, accessToken, refreshToken, expiresIn };
 };
 
 export const getProfileUser = async (userId) => {
@@ -74,5 +85,9 @@ export const getProfileUser = async (userId) => {
 
   const { password: passwordHash, ...userData } = user._doc;
 
-  return userData;
+  const { accessToken, refreshToken, expiresIn } = await generateTokens(
+    user._id
+  );
+
+  return { userData, accessToken, refreshToken, expiresIn };
 };

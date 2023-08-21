@@ -3,6 +3,21 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '../../utils/axios';
 import { getRandomAvatar } from '../../utils/avatar';
 
+const setTokens = (data) => {
+  if (data.accessToken) {
+    window.localStorage.setItem('accessToken', data.accessToken);
+  }
+
+  if (data.refreshToken) {
+    window.localStorage.setItem('refreshToken', data.refreshToken);
+  }
+
+  if (data.expiresIn) {
+    const expiresDate = new Date().getTime() + data.expiresIn * 1000;
+    window.localStorage.setItem('expires', expiresDate);
+  }
+};
+
 export const registerUser = createAsyncThunk(
   '@@auth/registerUser',
   async (userData) => {
@@ -16,11 +31,7 @@ export const registerUser = createAsyncThunk(
 
     try {
       const { data } = await axios.post('/auth/register', newUser);
-
-      if (data.token) {
-        window.localStorage.setItem('token', data.token);
-      }
-
+      setTokens(data);
       return data;
     } catch (error) {
       console.log(error);
@@ -37,10 +48,7 @@ export const loginUser = createAsyncThunk(
         email,
         password,
       });
-
-      if (data.token) {
-        window.localStorage.setItem('token', data.token);
-      }
+      setTokens(data);
       return data;
     } catch (error) {
       console.log(error);
@@ -51,6 +59,7 @@ export const loginUser = createAsyncThunk(
 export const getProfile = createAsyncThunk('@@auth/getProfile', async () => {
   try {
     const { data } = await axios.get('/auth/profile');
+    setTokens(data);
     return data;
   } catch (error) {
     console.log(error);
